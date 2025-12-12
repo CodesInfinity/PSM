@@ -6,31 +6,31 @@ package modelo;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
  * @author agustinrodriguez
  */
 public class ModeloAhorcado {
-    
-    // Atributos
+
     private String palabraSecreta;
-    private char[] palabraOculta;
+    private char[] palabraOculta; 
     private int intentosFallidos;
     private final int MAX_INTENTOS = 6;
     private Set<Character> letrasUsadas;
-    
-    // Control marcador
-    private int victoriasJugador1;
-    private int victoriasJugador2;
+
+    // Marcador global (Mejor de 5)
+    private int victoriasJugador1; 
+    private int victoriasJugador2; 
     private int partidasJugadas;
-    
+
     public ModeloAhorcado() {
         this.victoriasJugador1 = 0;
         this.victoriasJugador2 = 0;
         this.partidasJugadas = 0;
     }
-    
+
     public void iniciarNuevaPartida(String palabra) {
         this.palabraSecreta = palabra.toUpperCase();
         this.intentosFallidos = 0;
@@ -45,29 +45,27 @@ public class ModeloAhorcado {
             }
         }
     }
-    
+
     public boolean probarLetra(char letra) {
         letra = Character.toUpperCase(letra);
-        
-        if (letrasUsadas.contains(letra))
-            return false;
-        
+        if (letrasUsadas.contains(letra)) return false; 
+
         letrasUsadas.add(letra);
         boolean acierto = false;
-        
+
         for (int i = 0; i < palabraSecreta.length(); i++) {
             if (palabraSecreta.charAt(i) == letra) {
                 palabraOculta[i] = letra;
                 acierto = true;
             }
         }
-        
-        if (!acierto)
+
+        if (!acierto) {
             intentosFallidos++;
-        
+        }
         return acierto;
     }
-    
+
     public String obtenerProgreso() {
         StringBuilder sb = new StringBuilder();
         for (char c : palabraOculta) {
@@ -75,41 +73,46 @@ public class ModeloAhorcado {
         }
         return sb.toString().trim();
     }
-    
+
+    public String getLetrasUsadasStr() {
+        if (letrasUsadas.isEmpty()) return "Ninguna";
+        // Ordenamos alfabéticamente y unimos con guiones
+        return letrasUsadas.stream()
+                .sorted()
+                .map(String::valueOf)
+                .collect(Collectors.joining(" - "));
+    }
+
     public int getIntentosFallidos() {
         return intentosFallidos;
     }
-    
+
     public boolean haGanadoRonda() {
         for (char c : palabraOculta) {
-            if (c == '_')
-                return false;
+            if (c == '_') return false;
         }
         return true;
     }
-    
+
     public boolean haPerdidoRonda() {
         return intentosFallidos >= MAX_INTENTOS;
     }
-    
+
     public void registrarResultado(boolean adivinadorGano, boolean turnoDeJ1ComoEscritor) {
         partidasJugadas++;
         
         if (adivinadorGano) {
-            // Si adivinó, gana punto el adivinador
             if (turnoDeJ1ComoEscritor) victoriasJugador2++; else victoriasJugador1++;
         } else {
-            // Si perdió, gana punto el escritor
             if (turnoDeJ1ComoEscritor) victoriasJugador1++; else victoriasJugador2++;
         }
     }
-    
+
     public String getPuntuacionGlobal() {
         return "J1: " + victoriasJugador1 + "  vs  J2: " + victoriasJugador2 + " (Partida " + (partidasJugadas + 1) + "/5)";
     }
 
     public boolean esFinDeSerie() {
-        // Gana quien llegue a 3 victorias (mejor de 5)
         return victoriasJugador1 == 3 || victoriasJugador2 == 3 || partidasJugadas == 5;
     }
     

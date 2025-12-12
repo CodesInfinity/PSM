@@ -30,7 +30,6 @@ public class ControladorAhorcado implements ActionListener {
     }
 
     private void iniciarRonda() {
-        // Determinar quién escribe basado en si el número de partida es par o impar
         boolean turnoJ1Escribe = (modelo.getPartidasJugadas() % 2 == 0);
         String escritor = turnoJ1Escribe ? "JUGADOR 1" : "JUGADOR 2";
         
@@ -39,13 +38,14 @@ public class ControladorAhorcado implements ActionListener {
         String palabra = "";
         while (palabra == null || palabra.trim().isEmpty()) {
             palabra = vista.pedirPalabraSecreta(escritor);
-            if (palabra == null) System.exit(0); // Si cancelan, salir
+            if (palabra == null) System.exit(0); 
         }
 
         modelo.iniciarNuevaPartida(palabra);
         vista.actualizarDibujo(0);
         vista.actualizarPalabra(modelo.obtenerProgreso());
         vista.actualizarPuntuacion(modelo.getPuntuacionGlobal());
+        vista.actualizarLetrasUsadas(""); // <--- NUEVO: Limpiar al inicio
         vista.actualizarMensaje("¡Adivina la palabra!");
         vista.limpiarInput();
     }
@@ -57,11 +57,11 @@ public class ControladorAhorcado implements ActionListener {
 
         char letra = texto.charAt(0);
         
-        // Probar letra en modelo
         boolean acierto = modelo.probarLetra(letra);
 
-        // Actualizar Vista
         vista.limpiarInput();
+        vista.actualizarLetrasUsadas(modelo.getLetrasUsadasStr());
+
         if (acierto) {
             vista.actualizarPalabra(modelo.obtenerProgreso());
         } else {
@@ -69,11 +69,10 @@ public class ControladorAhorcado implements ActionListener {
             vista.mostrarAlerta("¡Letra incorrecta!");
         }
 
-        // Verificar condiciones de fin de ronda
         if (modelo.haGanadoRonda()) {
             finalizarRonda(true);
         } else if (modelo.haPerdidoRonda()) {
-            vista.actualizarPalabra("Era: " + modelo.obtenerProgreso()); // Mostrar solución si quieres
+            vista.actualizarPalabra("Era: " + modelo.obtenerProgreso()); 
             finalizarRonda(false);
         }
     }
@@ -82,7 +81,6 @@ public class ControladorAhorcado implements ActionListener {
         String msg = adivinadorGano ? "¡HAS GANADO LA RONDA!" : "¡HAS SIDO AHORCADO!";
         vista.mostrarAlerta(msg);
 
-        // Determinar quién era el escritor para dar puntos
         boolean turnoJ1Escribe = (modelo.getPartidasJugadas() % 2 == 0);
         modelo.registrarResultado(adivinadorGano, turnoJ1Escribe);
         
@@ -96,7 +94,7 @@ public class ControladorAhorcado implements ActionListener {
                 System.exit(0);
             }
         } else {
-            iniciarRonda(); // Siguiente ronda
+            iniciarRonda(); 
         }
     }
 }
