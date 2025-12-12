@@ -15,3 +15,4 @@ dist/
 
 # Archivos de sistema Mac
 .DS_Store
+/Ahorcado/nbproject/private/
