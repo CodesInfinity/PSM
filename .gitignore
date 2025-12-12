@@ -1,0 +1,17 @@
+# Archivos compilados
+*.class
+target/
+build/
+out/
+dist/
+
+# Archivos de IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Archivos de sistema Mac
+.DS_Store
